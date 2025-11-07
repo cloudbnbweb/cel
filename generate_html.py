@@ -9,14 +9,14 @@ OUTPUT_HTML = os.path.join(PROJECT_ROOT, "index.html")
 def generate_html():
     csv_path = os.path.join(DATA_FOLDER, "products.csv")
     if not os.path.exists(csv_path):
-        print("❌ No se encontró products.csv")
+        print("ERROR: No se encontro products.csv")
         return
 
     products = []
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row["title"] and row["title"] != "Sin productos disponibles":
+            if row["title"] and row["title"] not in ["Sin productos disponibles", ""]:
                 products.append(row)
 
     html = """<!DOCTYPE html>
@@ -123,8 +123,8 @@ def generate_html():
 <body>
     <div class="container">
         <header>
-            <h1>📦 Mi MiniTienda - Tecno Center</h1>
-            <p>¿Interesado? Escríbeme por WhatsApp para reservar o más info.</p>
+            <h1>Mi MiniTienda - Tecno Center</h1>
+            <p>¿Interesado? Escríbeme por WhatsApp para reservar.</p>
         </header>
 
         <div class="product-grid">
@@ -134,10 +134,8 @@ def generate_html():
         img_src = f"data/images/{p['image_file']}" if p['image_file'] else "https://via.placeholder.com/280x200?text=Sin+imagen"
         base_price = f"{float(p['price_base']):.2f}" if p['price_base'] else "0.00"
         reseller_price = f"{float(p['price_reseller']):.2f}" if p['price_reseller'] else "5.00"
-
-        # Reemplazar comillas para evitar romper el HTML
-        title_safe = p['title'].replace('"', '&quot;')
-        desc_safe = p['description'].replace('"', '&quot;').replace('\n', '<br>')
+        title_safe = p['title'].replace('"', '&quot;').replace('&', '&amp;')
+        desc_safe = p['description'].replace('"', '&quot;').replace('&', '&amp;').replace('\n', '<br>')
 
         html += f'''
             <div class="product-card">
@@ -146,10 +144,10 @@ def generate_html():
                     <div class="product-title">{title_safe}</div>
                     <div class="product-desc">{desc_safe}</div>
                     <div class="price-old">Original: {base_price} USD</div>
-                    <div class="price-new">👉 Revendedor: {reseller_price} USD</div>
-                    <a href="https://wa.me/5351234567?text=Hola,%20estoy%20interesado%20en%20el%20producto:%20{title_safe.replace(" ", "%20")}" 
+                    <div class="price-new">Revendedor: {reseller_price} USD</div>
+                    <a href="https://wa.me/5350365089?text=Hola,%20estoy%20interesado%20en:%20{title_safe.replace(" ", "%20")}" 
                        class="btn-whatsapp" target="_blank">
-                        📩 Pedir por WhatsApp
+                        Pedir por WhatsApp
                     </a>
                 </div>
             </div>
@@ -159,7 +157,7 @@ def generate_html():
         </div>
 
         <footer>
-            <p>© """ + datetime.now().strftime("%Y") + """ - Mi MiniTienda. Productos actualizados automáticamente desde Tecno Center.</p>
+            <p>© """ + datetime.now().strftime("%Y") + """ - Mi MiniTienda. Productos actualizados desde Tecno Center.</p>
         </footer>
     </div>
 </body>
@@ -168,7 +166,7 @@ def generate_html():
 
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"✅ Página HTML generada en {OUTPUT_HTML}")
+    print(f"[OK] Pagina HTML generada en {OUTPUT_HTML}")
 
 if __name__ == "__main__":
     generate_html()
