@@ -5,15 +5,16 @@ import time
 import threading
 import subprocess
 import requests
+import re
 from urllib.parse import urlparse
 from datetime import datetime
 
 # === CONFIGURACIÓN ===
-API_URL = "https://api.olaclick.app/api/v1/companies/tecnocentercuba/products"
+BASE_URL = "https://tecnocentercuba.com/products"
 PROJECT_ROOT = r"C:\Users\Arian\Documents\GitHub\cel"
 DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
 IMAGES_FOLDER = os.path.join(DATA_FOLDER, "images")
-DEBUG_JSON = os.path.join(PROJECT_ROOT, "debug_api.json")
+DEBUG_HTML = os.path.join(PROJECT_ROOT, "debug.html")
 
 os.makedirs(IMAGES_FOLDER, exist_ok=True)
 
@@ -29,7 +30,7 @@ def wait_for_manual_trigger():
         input("\n💡 Presiona ENTER para forzar una actualización manual.\n")
         manual_trigger = True
     except EOFError:
-        print("\n⚠️ Input no disponible. Continuando en modo automático.")
+        print("\n⚠️ Input no disponible. Esperando en modo automático.")
         time.sleep(3600)
         threading.Thread(target=wait_for_manual_trigger, daemon=True).start()
 
@@ -46,65 +47,103 @@ def download_image(img_url, filename):
         print(f"[{datetime.now()}] ❌ Error descargando imagen {img_url}: {e}")
         return ""
 
-def scrape_from_api():
-    print(f"[{datetime.now()}] 🌐 Consultando API oficial de Tecno Center...")
+def extract_products_from_html(html_content):
+    print(f"[{datetime.now()}] 🔍 Buscando JSON-LD en el HTML...")
+    # Buscar el bloque exacto que contiene los productos
+    pattern = r'<script[^>]*data-hid="products-ld-json-schema"[^>]*type="application/ld\+json"[^>]*>(.*?)</script>'
+    match = re.search(pattern, html_content, re.DOTALL | re.IGNORECASE)
+    
+    if not match:
+        # Intentar fallback: cualquier script con type=application/ld+json
+        pattern_fallback = r'<script[^>]*type\s*=\s*["\']application/ld\+json["\'][^>]*>(.*?)</script>'
+        match = re.search(pattern_fallback, html_content, re.DOTALL | re.IGNORECASE)
+
+    if not match:
+        raise ValueError("❌ No se encontró ningún bloque JSON-LD en el HTML.")
+
     try:
-        response = requests.get(API_URL, headers=HEADERS, timeout=15)
-        response.raise_for_status()
-        data = response.json()
-
-        # Guardar para debugging
-        with open(DEBUG_JSON, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"   💾 Respuesta de API guardada en: {DEBUG_JSON}")
-
+        json_text = match.group(1).strip()
+        data = json.loads(json_text)
+        menu_sections = data.get("hasMenuSection", [])
         products = []
-        for item in data.get("data", []):
-            name = item.get("name", "").strip()
-            if not name or name in ["Pasos para realizar un pedido", "Métodos de Pago", "Garantia de Moviles"]:
+        for section in menu_sections:
+            for item in section.get("hasMenuItem", []):
+                if item.get("@type") == "MenuItem":
+                    products.append(item)
+        if not products:
+            raise ValueError("⚠️ JSON-LD encontrado, pero sin productos.")
+        print(f"   ✅ Encontrados {len(products)} productos.")
+        return products
+    except json.JSONDecodeError as e:
+        raise ValueError(f"❌ Error al parsear JSON-LD: {e}")
+
+def scrape_and_save():
+    print(f"[{datetime.now()}] 🌐 Descargando página desde {BASE_URL}...")
+    try:
+        response = requests.get(BASE_URL, headers=HEADERS, timeout=15)
+        response.raise_for_status()
+        html_content = response.text
+
+        with open(DEBUG_HTML, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        print(f"   💾 HTML guardado en: {DEBUG_HTML}")
+
+        products = extract_products_from_html(html_content)
+
+        # Filtrar entradas no deseadas
+        cleaned = []
+        skip_names = {"Pasos para realizar un pedido", "Métodos de Pago", "Garantia de Moviles", "Whatsapp Gestor 1", "Whatsapp Gestor 2"}
+        for p in products:
+            name = p.get("name", "").strip()
+            if not name or name in skip_names:
                 continue
 
-            description = item.get("description", "").strip()
-            image_url = item.get("image_thumbnail_url", "") or item.get("image_url", "")
-            price = item.get("price", 0)
-            currency = "USD"
+            desc = p.get("description", "").strip()
+            img_url = p.get("image", "").strip()
+            offers = p.get("offers", {})
+            price = offers.get("price", 0)
+            currency = offers.get("priceCurrency", "USD")
 
-            price_reseller = round(float(price) + 5.0, 2)
+            try:
+                price = float(price)
+            except (TypeError, ValueError):
+                price = 0.0
+
+            price_reseller = round(price + 5.0, 2)
 
             img_file = ""
-            if image_url:
-                parsed = urlparse(image_url)
+            if img_url:
+                parsed = urlparse(img_url)
                 img_name = os.path.basename(parsed.path)
                 if not img_name or "." not in img_name:
                     safe = "".join(c for c in name if c.isalnum() or c in " _-")
                     img_name = f"{safe[:50]}.jpg"
-                img_file = download_image(image_url, img_name)
+                img_file = download_image(img_url, img_name)
 
-            products.append({
+            cleaned.append({
                 "title": name,
-                "description": description,
+                "description": desc,
                 "price_base": price,
                 "price_reseller": price_reseller,
                 "price_currency": currency,
                 "image_file": img_file,
-                "image_url": image_url,
+                "image_url": img_url,
                 "scraped_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
 
-        # Guardar CSV
         csv_path = os.path.join(DATA_FOLDER, "products.csv")
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
-            if products:
-                writer = csv.DictWriter(f, fieldnames=products[0].keys())
+            if cleaned:
+                writer = csv.DictWriter(f, fieldnames=cleaned[0].keys())
                 writer.writeheader()
-                writer.writerows(products)
-                print(f"[{datetime.now()}] ✅ Guardados {len(products)} productos.")
+                writer.writerows(cleaned)
+                print(f"[{datetime.now()}] ✅ Guardados {len(cleaned)} productos en CSV.")
             else:
                 f.write("title,description,price_base,price_reseller,price_currency,image_file,image_url,scraped_at\n")
                 print(f"[{datetime.now()}] ⚠️ No se encontraron productos válidos.")
 
     except Exception as e:
-        print(f"[{datetime.now()}] 🔥 Error al consultar la API: {e}")
+        print(f"[{datetime.now()}] 🔥 Error al scrapear: {e}")
 
 def run_generate_html():
     print(f"[{datetime.now()}] 🖥️ Generando HTML estático...")
@@ -122,7 +161,7 @@ def run_generate_html():
         else:
             print(f"[{datetime.now()}] [ERROR] generate_html.py:\n{result.stderr}")
     except Exception as e:
-        print(f"[{datetime.now()}] 🔥 Excepción: {e}")
+        print(f"[{datetime.now()}] 🔥 Excepción en generate_html.py: {e}")
 
 def git_commit_and_push():
     print(f"[{datetime.now()}] 🚀 Git: commit + push...")
@@ -131,25 +170,25 @@ def git_commit_and_push():
         subprocess.run(["git", "add", "."], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
         if not status.stdout.strip():
-            print("   ℹ️ Sin cambios.")
+            print("   ℹ️ Sin cambios nuevos.")
             return
         commit_msg = f"📦 Actualización de productos - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
         subprocess.run(["git", "commit", "-m", commit_msg], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(["git", "push"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("   ✅ Push exitoso.")
     except FileNotFoundError:
-        print("   ❌ 'git' no encontrado. Instala Git y agrégalo al PATH.")
+        print("   ❌ 'git' no encontrado. Instálalo y agrégalo al PATH.")
     except Exception as e:
         print(f"   ❌ Error en Git: {e}")
 
 def run_full_cycle():
-    scrape_from_api()
+    scrape_and_save()
     run_generate_html()
     git_commit_and_push()
 
 def main():
     global manual_trigger
-    print("🚀 Scraper para Tecno Center (usando API oficial de OlaClick)")
+    print("🚀 Scraper para Tecno Center (usando JSON-LD desde debug.html)")
     print("🔁 Automático: cada 24h | ⌨️ Manual: presiona ENTER\n")
 
     input_thread = threading.Thread(target=wait_for_manual_trigger, daemon=True)
