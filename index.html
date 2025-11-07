@@ -1,199 +1,199 @@
-!DOCTYPE html
-html lang=es
-head
-  meta charset=UTF-8 
-  meta name=viewport content=width=device-width, initial-scale=1.0
-  title📱 Mi MiniTienda - Catálogo de Smartphonestitle
-  link href=httpsfonts.googleapis.comcss2family=Poppinswght@300;400;500;600&display=swap rel=stylesheet
-  style
-     {
-      margin 0;
-      padding 0;
-      box-sizing border-box;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📱 Mi MiniTienda - Catálogo de Smartphones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family 'Poppins', sans-serif;
-      background linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
-      color #333;
-      padding 20px;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+      color: #333;
+      padding: 20px;
     }
 
     header {
-      text-align center;
-      margin-bottom 30px;
-      padding 20px 0;
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
     }
 
     h1 {
-      font-weight 700;
-      font-size 2.2rem;
-      color #0d47a1;
-      margin-bottom 8px;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: #0d47a1;
+      margin-bottom: 8px;
     }
 
     .subtitle {
-      color #546e7a;
-      font-size 1.05rem;
+      color: #546e7a;
+      font-size: 1.05rem;
     }
 
     .catalog {
-      display grid;
-      grid-template-columns repeat(auto-fill, minmax(260px, 1fr));
-      gap 24px;
-      max-width 1300px;
-      margin 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1300px;
+      margin: 0 auto;
     }
 
     .product-card {
-      background white;
-      border-radius 16px;
-      overflow hidden;
-      box-shadow 0 6px 18px rgba(0,0,0,0.08);
-      transition transform 0.3s ease;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
     }
 
-    .product-cardhover {
-      transform translateY(-5px);
+    .product-card:hover {
+      transform: translateY(-5px);
     }
 
     .product-image {
-      width 100%;
-      height 160px;
-      background-color #f0f4ff;
-      display flex;
-      align-items center;
-      justify-content center;
-      font-size 13px;
-      color #777;
-      font-weight 500;
+      width: 100%;
+      height: 160px;
+      background-color: #f0f4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #777;
+      font-weight: 500;
     }
 
     .product-info {
-      padding 16px;
+      padding: 16px;
     }
 
     .product-name {
-      font-weight 600;
-      font-size 1.1rem;
-      color #0d47a1;
-      margin-bottom 6px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #0d47a1;
+      margin-bottom: 6px;
     }
 
     .product-specs {
-      font-size 0.9rem;
-      color #555;
-      margin 4px 0;
+      font-size: 0.9rem;
+      color: #555;
+      margin: 4px 0;
     }
 
     .product-price {
-      font-weight 700;
-      font-size 1.2rem;
-      color #2e7d32;
-      margin 8px 0;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #2e7d32;
+      margin: 8px 0;
     }
 
     .whatsapp-btn {
-      display block;
-      width 100%;
-      padding 10px;
-      background #25d366;
-      color white;
-      text-align center;
-      text-decoration none;
-      font-weight 600;
-      border-radius 8px;
-      margin-top 10px;
-      transition background 0.2s;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #25d366;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      margin-top: 10px;
+      transition: background 0.2s;
     }
 
-    .whatsapp-btnhover {
-      background #1da851;
-      transform scale(1.02);
+    .whatsapp-btn:hover {
+      background: #1da851;
+      transform: scale(1.02);
     }
 
     footer {
-      text-align center;
-      margin-top 50px;
-      color #666;
-      font-size 0.9rem;
+      text-align: center;
+      margin-top: 50px;
+      color: #666;
+      font-size: 0.9rem;
     }
-  style
-head
-body
+  </style>
+</head>
+<body>
 
-  header
-    h1🛍️ Mi MiniTienda Digitalh1
-    p class=subtitleCatálogo de smartphones • Precios en USD • Envíos desde Cubap
-  header
+  <header>
+    <h1>🛍️ Mi MiniTienda Digital</h1>
+    <p class="subtitle">Catálogo de smartphones • Precios en USD • Envíos desde Cuba</p>
+  </header>
 
-  div class=catalog
+  <div class="catalog">
 
-    !-- Producto 1 --
-    div class=product-card
-      div class=product-imagetcl-l5.jpgdiv
-      div class=product-info
-        div class=product-nameTCL L5div
-        div class=product-specs1 GB RAM  16 GBdiv
-        div class=product-price$60div
-        a href=httpswa.me5356880024text=Hola,%20quiero%20comprar%20TCL%20L5 class=whatsapp-btn target=_blankComprar por WhatsAppa
-      div
-    div
+    <!-- Producto 1 -->
+    <div class="product-card">
+      <div class="product-image">tcl-l5.jpg</div>
+      <div class="product-info">
+        <div class="product-name">TCL L5</div>
+        <div class="product-specs">1 GB RAM / 16 GB</div>
+        <div class="product-price">$60</div>
+        <a href="https://wa.me/5356880024?text=Hola,%20quiero%20comprar:%20TCL%20L5" class="whatsapp-btn" target="_blank">Comprar por WhatsApp</a>
+      </div>
+    </div>
 
-    !-- Producto 2 --
-    div class=product-card
-      div class=product-imageblu-c5l-max.jpgdiv
-      div class=product-info
-        div class=product-nameBlu C5L Maxdiv
-        div class=product-specs2 GB RAM  16 GBdiv
-        div class=product-price$65div
-        a href=httpswa.me5356880024text=Hola,%20quiero%20comprar%20Blu%20C5L%20Max class=whatsapp-btn target=_blankComprar por WhatsAppa
-      div
-    div
+    <!-- Producto 2 -->
+    <div class="product-card">
+      <div class="product-image">blu-c5l-max.jpg</div>
+      <div class="product-info">
+        <div class="product-name">Blu C5L Max</div>
+        <div class="product-specs">2 GB RAM / 16 GB</div>
+        <div class="product-price">$65</div>
+        <a href="https://wa.me/5356880024?text=Hola,%20quiero%20comprar:%20Blu%20C5L%20Max" class="whatsapp-btn" target="_blank">Comprar por WhatsApp</a>
+      </div>
+    </div>
 
-    !-- Producto 3 --
-    div class=product-card
-      div class=product-imagegalaxy-a03.jpgdiv
-      div class=product-info
-        div class=product-nameSamsung Galaxy A03div
-        div class=product-specs3 GB RAM  32 GBdiv
-        div class=product-price$105div
-        a href=httpswa.me5356880024text=Hola,%20quiero%20comprar%20Samsung%20Galaxy%20A03 class=whatsapp-btn target=_blankComprar por WhatsAppa
-      div
-    div
+    <!-- Producto 3 -->
+    <div class="product-card">
+      <div class="product-image">galaxy-a03.jpg</div>
+      <div class="product-info">
+        <div class="product-name">Samsung Galaxy A03</div>
+        <div class="product-specs">3 GB RAM / 32 GB</div>
+        <div class="product-price">$105</div>
+        <a href="https://wa.me/5356880024?text=Hola,%20quiero%20comprar:%20Samsung%20Galaxy%20A03" class="whatsapp-btn" target="_blank">Comprar por WhatsApp</a>
+      </div>
+    </div>
 
-    !-- Producto 4 --
-    div class=product-card
-      div class=product-imagetecno-spark-go-1s.jpgdiv
-      div class=product-info
-        div class=product-nameTecno Spark Go 1Sdiv
-        div class=product-specs3+3 GB RAM  64 GBdiv
-        div class=product-price$110div
-        a href=httpswa.me5356880024text=Hola,%20quiero%20comprar%20Tecno%20Spark%20Go%201S class=whatsapp-btn target=_blankComprar por WhatsAppa
-      div
-    div
+    <!-- Producto 4 -->
+    <div class="product-card">
+      <div class="product-image">tecno-spark-go-1s.jpg</div>
+      <div class="product-info">
+        <div class="product-name">Tecno Spark Go 1S</div>
+        <div class="product-specs">3+3 GB RAM / 64 GB</div>
+        <div class="product-price">$110</div>
+        <a href="https://wa.me/5356880024?text=Hola,%20quiero%20comprar:%20Tecno%20Spark%20Go%201S" class="whatsapp-btn" target="_blank">Comprar por WhatsApp</a>
+      </div>
+    </div>
 
-    !-- Producto 5 --
-    div class=product-card
-      div class=product-imageredmi-a3x.jpgdiv
-      div class=product-info
-        div class=product-nameRedmi A3Xdiv
-        div class=product-specs3 GB RAM  64 GBdiv
-        div class=product-price$110div
-        a href=httpswa.me5356880024text=Hola,%20quiero%20comprar%20Redmi%20A3X class=whatsapp-btn target=_blankComprar por WhatsAppa
-      div
-    div
+    <!-- Producto 5 -->
+    <div class="product-card">
+      <div class="product-image">redmi-a3x.jpg</div>
+      <div class="product-info">
+        <div class="product-name">Redmi A3X</div>
+        <div class="product-specs">3 GB RAM / 64 GB</div>
+        <div class="product-price">$110</div>
+        <a href="https://wa.me/5356880024?text=Hola,%20quiero%20comprar:%20Redmi%20A3X" class="whatsapp-btn" target="_blank">Comprar por WhatsApp</a>
+      </div>
+    </div>
 
-    !-- Producto 6 --
-    div class=product-card style=displaynone;
-      !-- Puedes descomentar más productos cuando tengas fotos --
-    div
+    <!-- Producto 6 -->
+    <div class="product-card" style="display:none;">
+      <!-- Puedes descomentar más productos cuando tengas fotos -->
+    </div>
 
-  div
+  </div>
 
-  footer
-    p© 2025 Mi MiniTienda • Todos los precios en USD • Contacto +53 5 6880 024p
-  footer
+  <footer>
+    <p>© 2025 Mi MiniTienda • Todos los precios en USD • Contacto: +53 5 6880 024</p>
+  </footer>
 
-body
-html
+</body>
+</html>
