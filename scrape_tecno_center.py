@@ -19,8 +19,6 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 }
 
-# === FUNCIONES ===
-
 def download_image(img_url, filename):
     try:
         response = requests.get(img_url, headers=HEADERS, timeout=10)
@@ -74,13 +72,15 @@ def scrape_products_from_jsonld():
             except (TypeError, ValueError):
                 price = 0.0
 
-            price_reseller = round(price + 5.0, 2)
+            price_reseller = round(price + 5.0, 2)  # +5 USD
 
             img_filename = ""
             if image_url:
-                img_name = os.path.basename(urlparse(image_url).path)
+                parsed = urlparse(image_url)
+                img_name = os.path.basename(parsed.path)
                 if not img_name or "." not in img_name:
-                    img_name = f"{name.replace(' ', '_').replace('/', '_')}.jpg"
+                    safe_name = "".join(c for c in name if c.isalnum() or c in " _-")
+                    img_name = f"{safe_name[:50]}.jpg"
                 img_filename = download_image(image_url, img_name)
 
             products.append({
@@ -130,20 +130,15 @@ def git_commit_and_push():
     try:
         os.chdir(PROJECT_ROOT)
 
-        # Agregar cambios
         subprocess.run(["git", "add", "."], check=True)
 
-        # Verificar si hay cambios para commitear
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
         if not status.stdout.strip():
             print(f"[{datetime.now()}] ℹ️ No hay cambios nuevos para commitear.")
             return
 
-        # Hacer commit
         commit_msg = f"Actualización automática de productos - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         subprocess.run(["git", "commit", "-m", commit_msg], check=True)
-
-        # Hacer push
         subprocess.run(["git", "push"], check=True)
 
         print(f"[{datetime.now()}] ✅ Push realizado con éxito.")
@@ -152,7 +147,6 @@ def git_commit_and_push():
     except Exception as e:
         print(f"[{datetime.now()}] 🔥 Error inesperado en Git: {e}")
 
-# === BUCLE PRINCIPAL ===
 def main():
     print("🚀 Scraper + Publicador automático para Tecno Center")
     print("🔁 Ciclo: scrape → generate_html → git push (cada 24h)")
